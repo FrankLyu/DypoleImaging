@@ -1,0 +1,11 @@
+README.rst
+setup.py
+pyAndorSDK2/__init__.py
+pyAndorSDK2/_version.py
+pyAndorSDK2/atmcd.py
+pyAndorSDK2.egg-info/PKG-INFO
+pyAndorSDK2.egg-info/SOURCES.txt
+pyAndorSDK2.egg-info/dependency_links.txt
+pyAndorSDK2.egg-info/not-zip-safe
+pyAndorSDK2.egg-info/requires.txt
+pyAndorSDK2.egg-info/top_level.txt
