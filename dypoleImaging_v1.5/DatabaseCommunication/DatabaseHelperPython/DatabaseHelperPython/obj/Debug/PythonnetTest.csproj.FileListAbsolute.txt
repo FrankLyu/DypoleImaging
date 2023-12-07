@@ -1,0 +1,5 @@
+C:\Users\Dypole_Imaging\Desktop\AndorCamera\PythonnetTest\PythonnetTest\PythonnetTest\bin\Debug\PythonnetTest.dll
+C:\Users\Dypole_Imaging\Desktop\AndorCamera\PythonnetTest\PythonnetTest\PythonnetTest\bin\Debug\PythonnetTest.pdb
+C:\Users\Dypole_Imaging\Desktop\AndorCamera\PythonnetTest\PythonnetTest\PythonnetTest\obj\Debug\PythonnetTest.csproj.CoreCompileInputs.cache
+C:\Users\Dypole_Imaging\Desktop\AndorCamera\PythonnetTest\PythonnetTest\PythonnetTest\obj\Debug\PythonnetTest.dll
+C:\Users\Dypole_Imaging\Desktop\AndorCamera\PythonnetTest\PythonnetTest\PythonnetTest\obj\Debug\PythonnetTest.pdb
