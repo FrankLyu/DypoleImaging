@@ -1,0 +1,318 @@
+Changes since v1:
+Mono16 and uint16
+
+
+
+To read furhter:
+https://docs.python-guide.org/writing/structure/
+https://www.pythonstudio.us/wxpython/what-is-a-modelviewcontroller-system.html
+
+
+Urgent to do list
+image = np.array(im, dtype = np.int8) # np.int8 should be adapted from a variable in the DB telling the pixel depth of the camera.
+More globally all the reading function to ensure it is an integer array that is saved to the DB
+Accelerate the software
+Build an array in the imageViewer with analysis results saved in the DB => on its way
+Build an array in the imageViewer with analysis results from the image => on its way
+Figuring out how to properly bind things, use radiobuttons and their ids
+Comment correctly the double             while self.shouldCameraRun:
+                				print("Begin new sequence acquisition")
+Do the ImageDataManager and FitManager class: only start with those ones, integrate them in the UI, and then seperate the main application from the UI and create a new project.
+Check  what canvas.draw does and if I could remove some of these
+1D fit don't really give flat line when there are just zeros (check when you rotate the immage and drag an AOI to the 0 space...)
+Determine if I should seperate the core and the user interface. For instance when I click and update the AOI, what function should it raise? Is it smart to raise a function that is not within the user interface?
+I would say so, maybe creating another object within the core with is AOIManager, that gets activated at every events. Would that be slow? Dependancies in both ways which is bad?
+255 dark count in 16bits or 1 in 8 bits
+The writting of the nCount might be shiffted by one image...
+Figuring out how to make the test camera working again. runHardwareTriggerContinuous has summarized functions at the end
+
+Not urgent to do list
+Should delete all the checkLocalFiles => they got commented out
+dialog.GetFilename stayed like that, but could be removed
+Need to understand             self.betterRef = self.defringer.defringedRef(self.imageID, self.imageIDIndex, num, setRoiIndex = True)
+ defringing = self.checkApplyDefringing.GetValue() needs to be set to set to False otherwise it bugs during autoRun
+Checking the box defringing raises error because of imageID
+There is a weird bug that appears sometime where the image file is already deleted and then we call delete(imagefile) => have put a condition on the file existing in the fnction, monitor if there is a bigger proble, why is the image already gone????
+Correct this error:
+File "C:\Users\Dypole_Imaging\Desktop\dypole-imaging\buildingDy.py", line 2153, in updateImageListBox
+    self.imageListBox.Clear()
+RuntimeError: wrapped C/C++ object of type ListBox has been deleted
+The runHardwareTriggerContinuous need 2 ctrl + C to have interruption
+Understand the if self.press is None: return which has no return
+clearing out the readDB and readFile function, espacially since now the absorption image is only calculated internaly
+There is a bug when you rotate the image, not always there though
+The atom number doesnt update itself after the image loading
+Add a button to rewrite analysis
+updateAOI_PrimaryImageAndProfiles and edgeUpdate_Primary seem partially redondant when using aoiEdge
+Quite often thing are recalculated too many times> Typically the intergral and the 1D profile should be recalculated just when new file loaded and when new ROI released, that's all.
+Mayne add a 0.01 second delay after a on motion before redoing anything (would that create a problem when the experiment is running?)
+Old isues to monitor:
+Doesn't print the image if the fitting failed => Not seen anymore
+The absorption image of the fake image is always correct when you load the image from file, but not when you get it from the database => seems fine now
+Investigate what createNormalizedAbsorbImg really does
+Why do we save runID_fk in nCounts and not imageID_fk?
+Correct the definition of PSD => width**6 is a good proxy
+Seem to be a bug when rotating image: +10 and -10 don't come back to the original image
+Clicking on FLIR doesn't necesarly update the correct value for camera position
+closeCameraPtrAndSystem function in camera doesn't seem to be used, whereas we should make sure we close the camera correctly each time.
+Have the camera object not acting on the user interface plot, using the core class to store the image to from the camera, and then have the UI fetch it some time to time
+To accelerate to do list:
+Only recalculate the atomNumber when dragging the secondary AOI
+not rewrtting the AOI_PrimaryImage each time, but rather only using a cropped atomImage? 
+check what is calculated when you drag and AOI, minimal should be done
+Use blitting: https://matplotlib.org/3.3.0/tutorials/advanced/blitting.html    https://stackoverflow.com/questions/48491154/matplotlib-wxpython-backend-fast-update/49196469
+Fix the turning off of the camera after fluorescence. When you use just the fluorescence it bugs. But if you first open and close the camera then fluorescence works once, not twice.
+
+12/10/2020
+Mystery around the isXFitSuccessful and isYFitSuccessful that seem to be always set to False... I'm deleting those
+
+
+12/09/2020
+FIX THE SOFTWARE FOR THE WHILE LOOP => done
+Starting to create a DataManager class
+
+12/08/2020
+Oriented object program of handeling the camera
+Start and stop the process button with multi threading
+
+12/07/2020
+removed the "on_motion" drag because it was loosing half a second there
+Save analysis to DB => done
+Button resave analysis => done
+
+12/03/2020
+There is a bug when you rotate the image, not always there though
+I haven't modified the self.atomShot that is probably now in an integer type, this should be modified to float. => done, it is float because of the division
+ERROR CORRECTED: in aoiEdge: there was missing a -18 => eventually np.mean
+Why aoiEdge exists? => It is a way to calculate the difference in the light level, you integrate with 3 pixels around
+Implemented full seocndary AOI atom count
+What is plotted is now the OD
+Make the calculation offsetting with the secondary AOI => done
+
+12/02/2020
+Try to run the camera software at the same time, impossible. At least now the runHardwareTriggerLib runs continuously and has a keyboard stop
+Added self.isDummyImage = False to setRawData
+Added secondary AOI:
+	all varaible related to the primary one got renamed:
+		rect => rect_Primary
+		xLeft, yTop, xRigth, yBottom => _Primary
+		AOI AOI1 AOI2 AOI3 AOI4 => AOI1_Primary
+		leftRightEdge => leftRightEdge_Primary
+	+ added the _Secondary variables
+Check if self.press needs to be dedoubled, same for self.x1 slef.y1
+Maybe need to add some self.canvas_Secondary.draw() at some places
+AOIImage is the image enclosed in the Primary AOI, but probably need to define the AOI_PrimaryImage => did it
+Seperated the creation of atomImage with the read out
+add secondary ROI => done
+
+OLD -----------------------------------------
+
+To do list:
+Checking the box defringing raises error because of imageID
+Should delete all the checkLocalFiles => they got commented out
+dialog.GetFilename stayed like that, but could be removed
+Need to understand             self.betterRef = self.defringer.defringedRef(self.imageID, self.imageIDIndex, num, setRoiIndex = True)
+ defringing = self.checkApplyDefringing.GetValue() needs to be set to set to False otherwise it bugs during autoRun
+There is a weird bug that appears sometime where the image file is already deleted and then we call delete(imagefile) => have put a condition on the file existing in the fnction, monitor if there is a bigger proble, why is the image already gone????
+image = np.array(im, dtype = np.int8) # np.int8 should be adapted from a variable in the DB telling the pixel depth of the camera.
+I haven't modified the self.atomShot that is probably now in an integer type, this should be modified to float.
+More globally all the reading function to ensure it is an integer array that is saved to the DB
+add secondary ROI
+Correct this error:
+File "C:\Users\Dypole_Imaging\Desktop\dypole-imaging\buildingDy.py", line 2153, in updateImageListBox
+    self.imageListBox.Clear()
+RuntimeError: wrapped C/C++ object of type ListBox has been deleted
+Need to fix the imageList from the DB that doesn't correspond to the info showed in the setting box. => done, imageID is not directly extracted for getSelection()
+Doesn't print the image if the fitting failed
+
+Error with image: encoding or errors without a string argument : it is because on the image I loaded with real atoms, the atom and light shot get loaded as bytearray, whereas the dark is loaded as string => this is fixed in the dbFunctions, check the type before return
+
+The absorption image of the fake image is always correct when you load the image from file, but not when you get it from the database
+
+
+12/01/2020
+The Camera doesn't trigger in the sequence except if we open the imageViewer on the command shell of anaconda, and the runHardwareTrigger on spyder
+def getImageDatabase(imageID):
+    sql_query = """SELECT atoms, noAtoms, dark FROM images WHERE imageID = """ + str(imageID) + """;"""
+    byteArrayTuple = executeGetQuery(sql_query)
+    return byteArrayTuple[0]    # returns a tuple of 3 bytearrays
+seems to return a string, I modified it to get a byte but I'm suspicious something else is wrong
+
+11/25
+
+To do list:
+Checking the box defringing raises error because of imageID
+Should delete all the checkLocalFiles => they got commented out
+dialog.GetFilename stayed like that, but could be removed
+Need to understand             self.betterRef = self.defringer.defringedRef(self.imageID, self.imageIDIndex, num, setRoiIndex = True)
+ defringing = self.checkApplyDefringing.GetValue() needs to be set to set to False otherwise it bugs during autoRun
+There is a weird bug that appears sometime where the image file is already deleted and then we call delete(imagefile) => have put a condition on the file existing in the fnction, monitor if there is a bigger proble, why is the image already gone????
+image = np.array(im, dtype = np.int8) # np.int8 should be adapted from a variable in the DB telling the pixel depth of the camera.
+I haven't modified the self.atomShot that is probably now in an integer type, this should be modified to float.
+More globally all the reading function to ensure it is an integer array that is saved to the DB
+add secondary ROI
+Correct this error:
+File "C:\Users\Dypole_Imaging\Desktop\dypole-imaging\buildingDy.py", line 2153, in updateImageListBox
+    self.imageListBox.Clear()
+RuntimeError: wrapped C/C++ object of type ListBox has been deleted
+Need to fix the imageList from the DB that doesn't correspond to the info showed in the setting box.
+
+To do list:
+Checking the box defringing raises error because of imageID
+Should delete all the checkLocalFiles => they got commented out
+dialog.GetFilename stayed like that, but could be removed
+Need to understand             self.betterRef = self.defringer.defringedRef(self.imageID, self.imageIDIndex, num, setRoiIndex = True)
+ defringing = self.checkApplyDefringing.GetValue() needs to be set to set to False otherwise it bugs during autoRun
+There is a weird bug that appears sometime where the image file is already deleted and then we call delete(imagefile) => have put a condition on the file existing in the fnction, monitor if there is a bigger proble, why is the image already gone????
+
+The image seem to only show the absorption image and not the 4 possibilities when we toggle => resolved by setting false in isDummyImage in the autoRun function
+Very slow in the image plotting...
+
+To do list:
+Checking the box defringing raises error because of imageID
+Faire en sorte que mon ui.imageData qui contient le fichier image ne soit pas ecrase a chaque autoRun par fitImage. => done
+delete filetype variable => done
+Should delete all the checkLocalFiles => they got commented out
+dialog.GetFilename stayed like that, but could be removed
+Need to understand             self.betterRef = self.defringer.defringedRef(self.imageID, self.imageIDIndex, num, setRoiIndex = True)
+ defringing = self.checkApplyDefringing.GetValue() needs to be set to set to False otherwise it bugs during autoRun
+There is a weird bug that appears sometime where the image file is already deleted and then we call delete(imagefile)
+
+
+11/24
+Removed fileType variable 
+filename got transformed into imageID
+filenameText into imageIDText
+fileIndex into imageIDIndex
+modifiedFilename into modifiedImageID
+setFilenameText into setImageIDText and got mostly commented out
+updateLatestFilename into updateLatestImageID
+updateFileList into updateImageIDList
+fileList into imageIDList
+checkIfFileSizeChanged(self) got almost commented out and hasFileSizeChanged got set to False
+updateImageListBox(self) got almost commented out to remove checkLocalFiles
+
+self.camera = Camera("FLIR") # check if I can bind that to the original button position => done with self.FLIRCamera.SetValue(True)
+
+Changes in the wx.EVT_BUTTON:
+ui.fitImage(wx.EVT_BUTTON) becomes ui.fitImage() and self.showImg(e) becomes showImg()
+
+There are now 2 setData functions, one setDataNewIncomingFile that should only be called zhen a new incoming file arrives, that does not update the imageData from the imageID, and one setDataNewImageSelection that is called when there is a new image selection
+
+Trying to rewrite the setCurrentImg function, basically only doing imshow
+
+
+To do list:
+# readDBData should be reserved at reading fron the db. need to update the function
+
+[defringing, self.betterRef] should be reviewed and understood => it is used if there is a better light shot somewhere I believe, set in the defringing function
+ readapt readDBdata to pure DB versions
+ self.camera = Camera("FLIR") # check if I can bind that to the original button position
+defringing = self.checkApplyDefringing.GetValue() in setImageDataFile: I set it to False, otherwise the button raises and error, this should be fixed
+Faire en sorte que mon ui.imageData qui contient le fichier image ne soit pas ecrase a chaque autoRun par fitImage.
+
+
+11/23
+Added new Camera object
+Changed readData function in v6
+
+To do list:
+
+Pass along the list of images to update contained in ui.monitor.func.listOfValidImagesWaiting to make the program read those data and update the image.
+It could be that we read, delete the files (the deleting should be handled by the file manager part of the program, but think of how to pass along the data).
+Maybe having a structure like:    FileManager <==> DataReader <==> UI
+Understand why the plt.imshow takes 2 clicks to update, and verify that the correct image is plotted.
+Rotation image crashes
+
+
+11/17/2020
+
+Adding a fake image when the image is 1x1 pixel
+        img = Image.open('frankLloydWright.jpg')
+        self.dummyImage = np.array(img)[:,:,0]
+And in UpdatedImageOnUT:
+        if self.isDummyImage:
+            self.setCurrentImg(self.dummyImage, hasFileSizeChanged)
+            self.currentImg.autoscale()
+        else:
+
+
+Commented out most of the setData function (eventually wasn't the issue)
+in update1DProfile
+        try:                           
+            xMax = np.maximum(self.x_summed.max(), self.x_fitted.max())
+            print('trying to max')
+            xMin = np.minimum(self.x_summed.min(), self.x_fitted.min())
+        except: 
+            xMax = 1
+            xMin = 0
+
+Changed: self.x_width = 0 to self.x_width = 0.00001 (same for y) in update1DProfiles(self) because otherwise
+In updateTrueWidth
+        try:
+            std_avg = (self.true_x_width_std/self.true_x_width + self.true_y_width_std/self.true_y_width)/2
+        except Exception as ex:
+            print(ex)
+            std_avg = 0
+
+Created the function initializeDummyData() called in the initialization precess as well as in setData where the variable isDummyImage toggles
+
+        self.cameraType = "FLIR"  # FLIR or Andor
+Something weird in setFileType function
+
+New process function in the MyHandler class
+
+I have the impression I can deleted all the wx.EVT_BUTTON in the fitImage function, as well as showImage as it doesn't seem to do anything...
+
+        if not self.checkLocalFiles:
+            for fileName in self.fileList:      # it's a bit weird that I do not need to reverse that one
+                self.imageListBox.Append(str(fileName))
+        
+I should remove all the localPath references and put it in config
+
+
+
+
+
+Reading function:
+
+imgFunc_v6.readData: added the type "dbFile" to the list, and created the function readDatabaseFile(path)
+Need to update the height, width in reshape to either put it as a property of the object, or a global variable from the config file.
+
+self.fileType = "dbFile"   but check how coherent it is with self.checkLocalFiles
+
+showImg: added an if self.checkLocalFiles
+updateFileList(self): added an if self.checkLocalFiles
+
+Big one in the general declaration:         if self.checkLocalFiles:
+            localPath = LOCAL_PATH
+            ### WINDOWS VERSION ####
+            if (LOCAL_PATH[-2:] != "\\"):
+                localPath = LOCAL_PATH + "\\"
+            ### MAC VERSION ###
+    #        if (LOCAL_PATH[-1:] != "/"):
+    #            localPath = LOCAL_PATH + "/"
+            self.today = datetime.date.today()
+            self.path = localPath + str(self.today.year) + "\\" + str(self.today.month) + "\\" + str(self.today.day) + "\\"
+    #        self.path = localPath + str(self.today.year) + "/" + str(self.today.month) + "/" + str(self.today.day) + "/"
+    #        self.path = "D:\\Dropbox (MIT)\\BEC3-CODE\\imageAnalyze\\working branch\\fitting test\\thermal\\"
+            if not os.path.exists(self.path):
+                try:
+                    os.makedirs(self.path)
+                except:
+                    self.path = "/Users/pierre/lsls"
+
+
+In readDatabaseFile:
+	cameraHeight, cameraWidth = functions.getCameraDimensions(path) # look at the config file to make sure there is no conflict zith height and width
+
+
+def checkIfFileSizeChanged(self): added a self.checkLocalFiles
+
+        if (self.chosenLayerNumber == 4):
+            imageToShow = self.atomImage
+        else:
+            imageToShow = self.imageData[self.chosenLayerNumber - 1]
+
+self.panel = wx.lib.scrolledpanel.ScrolledPanel(self, id = -1,  size=(-1, -1))
+self.figure = Figure() and all its consequences.... Should I do the same with imagesBoxSizer = wx.StaticBoxSizer(imagesBox, wx.VERTICAL)?
