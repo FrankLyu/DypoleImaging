@@ -267,8 +267,10 @@ def InitUI(self):
 
 # 4 layer radio buttons
 
-    hbox421 = rcs.RowColSizer()
+    hbox421name = wx.StaticBox(self.panel, label='Image Process')
+    hbox421 = wx.StaticBoxSizer(hbox421name, wx.HORIZONTAL)
     hbox42 = wx.BoxSizer(wx.HORIZONTAL)
+
     boldFont = wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
     st17 = wx.StaticText(self.panel, label='X:')
     self.cursorX = wx.TextCtrl(self.panel,  style=wx.TE_READONLY|wx.TE_CENTRE, size = (50, 22))
@@ -322,16 +324,16 @@ def InitUI(self):
     self.vmax_def.Bind(wx.EVT_TEXT, self.setvmax)
 
     
-    hbox421.Add(hbox42,  flag= wx.ALL, border = 8, row=0, col=0)
-    hbox421.Add(defringingBoxSizer, flag = wx.ALL, row = 0 , col = 1)
-    hbox421.Add(rotationBoxSizer, flag = wx.ALL, row = 0 , col = 2)
-    hbox421.Add(vmax_def, flag = wx.ALL, border = 5,row = 0 , col = 3)
-    hbox421.Add(self.vmax_def, flag = wx.ALL, border = 5,row = 0 , col = 4)
+    hbox421.Add(hbox42,  flag= wx.ALL, border = 5)
+    hbox421.Add(defringingBoxSizer, flag = wx.ALL, border = 5 )
+    hbox421.Add(rotationBoxSizer, flag = wx.ALL, border = 5)
+    hbox421.Add(vmax_def, flag = wx.ALL, border = 5)
+    hbox421.Add(self.vmax_def, flag = wx.ALL, border = 5)
+    imagesBoxSizer.Add(hbox421,flag=wx.ALL| wx.EXPAND, border=5)
 
-#        defringingBoxSizer.Add(self.checkSaveAsRef, flag = wx.ALL, border = 5)
+#   defringingBoxSizer.Add(self.checkSaveAsRef, flag = wx.ALL, border = 5)
 
   
-    imagesBoxSizer.Add(hbox421,flag= wx.CENTER, border=5)
    ##
     atomNum = wx.StaticBox(self.panel, label='# of Atoms')
     atomNumBoxSizer = wx.StaticBoxSizer(atomNum, wx.VERTICAL)
