@@ -1,3 +1,8 @@
+# Update 1.6 (2024-05)
+Add fermionic fit, fit2Dshow and Gaussian Tail fit
+
+Fixed some small problems (of course)
+
 # ImageAnalyze
 ImageAnalyze software (since Oct. 2016)
 
