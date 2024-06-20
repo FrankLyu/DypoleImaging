@@ -1,8 +1,9 @@
 # Update 1.7 (2024-06) 
 Add back the ability to rotate the whole picture and primary ROI.
 
-# install dypoleimagingv1.7 on new PC. Something to notice when you first run the software on your PC:
+# install dypoleimagingv1.7 on new PC. 
 
+Something to notice when you first run the software on your PC:
 1. Some packages like skimage has another real library name. follow the instruction in cmd.
 2. Package clr is not called clr. Don't install it. If you already installed it, uninstall. Install pythonnet instead.
 3. Pyspin is a package from flir company. Google FLIR pyspin, log in their system and download python .whl file. Download the .whl file into your python. In the new PC, we are using python3.12. So there is not available pyspin yet. We commented all the FLIR sentences.
