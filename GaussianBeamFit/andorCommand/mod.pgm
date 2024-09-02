@@ -1,0 +1,186 @@
+//kinetic series mode for imaging both atoms with Andor camera
+//BEC3
+
+
+// acquisition settings
+SetTemperature(-30) :rem Sets the temperature
+SetElectronicShutteringMode(1)
+SetTriggerMode(1)
+//SetSingleScan(0)
+SetKinetics(0.008, 3, 0)
+
+fullHeight = 2160
+fullWidth = 2560
+//////////////////////////////////////////////////////////////////////////////
+///// Low field imaging setttings (with magnification lens) //////////////
+///// optimized for TOF = 0.5ms for Li, TOF = 12ms for Na ///////////////
+///// with magnetic trap shifted (for 500ms) 
+///////////////////////////////////////////////////////////////////////////////
+pixelSizeV = 600
+pixelSizeW = 1300
+
+pixelSizeV = fullHeight
+pixelSizeW = fullWidth
+offsetV = 100
+offsetH = 0
+offsetV = 0
+// TOF offset
+//offsetV = -500
+//offsetH = 00
+// in trap offset
+//offsetV = -150
+//offsetV = -100
+//offsetH = 100
+
+//offsetV = 0
+//offsetH = 0
+/////////////////////////////////////////////////////////////////////////////
+
+//pixelSizeV = 300 //700
+//pixelSizeW = 2000 //700
+//offsetV = -200 //0
+//offsetH = 0 // 0
+
+//pixelSizeV = fullHeight 
+//pixelSizeW = fullWidth 
+//offsetV = 0
+//offsetH = 0
+
+// Set the region of interest for the sensor
+hStart = (fullWidth - pixelSizeW)/2 + 1 + offsetH
+hEnd = hStart + pixelSizeW - 1
+hBin = 1
+vStart = (fullHeight - pixelSizeV)/2 + 1 + offsetV
+vEnd = vStart + pixelSizeV - 1
+vBin = 1
+
+// Dy Img creation
+SetImage(hStart, hEnd, hBin, vStart, vEnd,vBin) // H start, H end, H bin, V start, V end, V bin
+DyImg = 1
+create(#DyImg,"BareImages1",pixelSizeW,pixelSizeV,3)
+
+//Main Loop
+while(1)
+// functions related to making the file directory and name 
+gosub .GetTime
+gosub .GetDate
+gosub .MakeFileDir
+gosub .CreateFileName
+gosub .CreateFileDirAndName
+
+print("                             ")
+print("-------START -------")
+print("waiting for first trigger....")
+print("                             ")
+
+ShowTimings()
+run()
+
+print("saving images....")
+print("                             ")
+
+#DyImg{0} = #0_sig{0}
+#DyImg{1} = #0_sig{1}
+#DyImg{2} = #0_sig{2}
+
+
+// functions related to making the file directory and name 
+// gosub .GetTime
+// gosub .GetDate
+// gosub .MakeFileDir
+// gosub .CreateFileName
+// gosub .CreateFileDirAndName
+
+print("File Name Dy:  " + fileDirAndNameDy$)
+print("File Name Na:  " + fileDirAndNameNa$)
+print("File Name Li:  " + fileDirAndNameLi$)
+
+//SaveFITS(#NaImg, fileDirAndNameNa$, 0)
+//SaveFITS(#LiImg, fileDirAndNameLi$, 0)
+SaveFITS(#DyImg, fileDirAndNameDy$, 0)
+
+print("######END######")
+print("                             ")
+SaveOutput(fileDirDy$ + "timingOutput.txt")
+wend
+
+////////////////////////////////////////////////////////////////////////////
+///// sub functions ////
+////////////////////////////////////////////////////////////////////////////
+
+.GetTime
+//t$ format is (eg) 18:15:23.05
+		t$=time$()
+		h$=left$(t$,2)              :rem hours
+		m$=mid$(t$,4,2)             :rem minutes
+		s$=mid$(t$,7,2)             :rem seconds
+		ss$=right$(t$,2)            :rem seconds/100
+		mm = val(m$)
+		hh = val(h$)
+		ss = val(s$)
+		sss= val(ss$)
+return
+
+.GetDate
+//d$ format: 9/30/2016
+	d$ = date$()
+	if (!strcomp(mid$(d$,2,1),"/")) then
+		month$ = left$(d$, 1)
+		rest$ = right$(d$, val(len(d$))-2)
+	else
+		month$ = left$(d$, 2)
+		rest$ = right$(d$, val(len(d$))-3)
+	endif
+	month = val(month$)
+
+	if (!strcomp(mid$(rest$, 2,1), "/")) then
+		day$ = left$(rest$, 1)
+	else
+		day$ = left$(rest$, 2)
+	endif
+	day = val(day$)
+	
+	year$ = right$(d$, 4)
+	year = val(year$)
+return
+
+.MakeFileDir
+// if the folders exist already, the program basically does nothing
+// The parent folder should exist 
+	
+	//parent1$ = "C:\data\"
+	parent1$ = "C:\Users\Dypole_Imaging\Desktop\dypole-imaging\andorCommand\"	
+	parent2$ = parent1$ + "AndorTransfer\"
+	parent3$ = parent2$ + year$ + "\"
+	parent4$ = parent3$ + month$ + "\"
+	parent5$ = parent4$ + day$ + "\"
+	
+	fileDirNa$ = parent5$ + "Na\"
+	fileDirLi$ = parent5$ + "Li\"
+	fileDirDy$ = parent1$ + "image\"
+	//MakeDirectory(parent1$)
+	MakeDirectory(parent2$)
+	MakeDirectory(parent3$)
+	MakeDirectory(parent4$)	
+	MakeDirectory(parent5$)
+	
+	MakeDirectory(fileDirNa$)
+	MakeDirectory(fileDirLi$)
+return	
+
+.CreateFileName
+// the file name format: top_h_m_s-day_month_year.fits
+	imageDirection$ = "kinetics"
+	fileType$ = ".fits"
+	//fileName$ = imageDirection$ + "_" + h$ + "_" + m$ + "_" + s$ + "-" + day$ + "_" + month$ + "_" + right$(year$, 2) + fileType$
+	fileName$ = imageDirection$ + "_" + year$+"-"+month$+"-"+day$+ "_"  + h$ + "_" + m$ + "_" + s$ + fileType$
+return 
+
+.CreateFileDirAndName
+	fileDirAndNameNa$ =  fileDirNa$ + fileName$
+	fileDirAndNameLi$ =  fileDirLi$ + fileName$
+	fileDirAndNameDy$ =  fileDirDy$ + fileName$
+return
+	
+	
+	
