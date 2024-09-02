@@ -1,0 +1,110 @@
+//kinetic series mode for imaging both atoms with Andor camera
+//BEC3
+
+
+// acquisition settings
+SetTemperature(-30) :rem Sets the temperature
+SetElectronicShutteringMode(1)
+SetTriggerMode(1)
+//SetCMOSOverlap(1)
+//SetSingleScan(0)
+SetKinetics(0.001, 3, 0)
+//print("here1")
+//SetFastKinetics(100, 3, 100, 10)
+//print("here2")
+fullHeight = 2160
+fullWidth = 2560
+
+pixelSizeV = fullHeight
+pixelSizeW = fullWidth
+offsetH = 0
+offsetV = 0
+
+// Set the region of interest for the sensor
+//pixelSizeV = 500
+//pixelSizeW = 500
+//hStart = 1000 + 1
+//hEnd = 1500
+//vStart = 1000 + 1
+//vEnd = 1500
+
+hStart = (fullWidth - pixelSizeW)/2 + 1 + offsetH
+hEnd = hStart + pixelSizeW - 1
+vStart = (fullHeight - pixelSizeV)/2 + 1 + offsetV
+vEnd = vStart + pixelSizeV - 1
+hBin = 1
+vBin = 1
+
+
+// Vertical imaging
+pixelSizeV = 500
+pixelSizeW = 500
+hStart = 700 + 1
+hEnd = 1200
+vStart = 1200 + 1
+vEnd = 1700
+
+// Horizontal imaging
+pixelSizeV = 500
+pixelSizeW = 500
+hStart = 900 + 1
+hEnd = 1400
+vStart = 900 + 1
+vEnd = 1400
+
+pixelSizeV = fullHeight
+pixelSizeW = fullWidth
+offsetH = 0
+offsetV = 0
+
+// Set the region of interest for the sensor
+//pixelSizeV = 500
+//pixelSizeW = 500
+//hStart = 1000 + 1
+//hEnd = 1500
+//vStart = 1000 + 1
+//vEnd = 1500
+
+hStart = (fullWidth - pixelSizeW)/2 + 1 + offsetH
+hEnd = hStart + pixelSizeW - 1
+vStart = (fullHeight - pixelSizeV)/2 + 1 + offsetV
+vEnd = vStart + pixelSizeV - 1
+hBin = 1
+vBin = 1
+
+// Dy Img creation
+SetImage(hStart, hEnd, hBin, vStart, vEnd,vBin) // H start, H end, H bin, V start, V end, V bin
+DyImg = 1
+create(#DyImg,"BareImages1",pixelSizeW,pixelSizeV,3)
+
+//Main Loop
+while(1)
+// functions related to making the file directory and name
+parent1$ = "C:\Users\Dypole_Imaging\Desktop\dypole-imaging\andorCommand\"	
+fileDirDy$ = parent1$ + "image\"
+fileName$ = "combinedShots.fits"
+fileDirAndNameDy$ =  fileDirDy$ + fileName$
+
+print("                             ")
+print("-------START -------")
+print("waiting for first trigger....")
+print("                             ")
+
+ShowTimings()
+run()
+
+print("saving images....")
+print("                             ")
+
+#DyImg{1} = #0_sig{1}
+#DyImg{2} = #0_sig{2}
+#DyImg{3} = #0_sig{3}
+
+print("File Name Dy:  " + fileDirAndNameDy$)
+
+SaveFITS(#DyImg, fileDirAndNameDy$, 0)
+
+print("######END######")
+print("                             ")
+SaveOutput(fileDirDy$ + "timingOutput.txt")
+wend
